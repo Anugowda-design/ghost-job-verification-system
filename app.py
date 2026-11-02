@@ -78,7 +78,8 @@ def init_db():
 
     conn.commit()
     conn.close()
-    init_db()
+# Create database tables when the app starts
+init_db()
 
 
 # =========================================================
