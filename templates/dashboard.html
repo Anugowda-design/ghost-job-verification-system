@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Recruiter Dashboard — Ghost Job Verification System{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+  <!-- Dashboard Header -->
+  <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1px solid var(--border);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <h1 style="color: var(--text-main); font-size: 1.8rem;">Welcome, {{ recruiter.name }}</h1>
+          <span class="badge badge-active">
+            ✓ VERIFIED RECRUITER
+          </span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 1rem;">
+          🏢 <strong>{{ recruiter.company }}</strong> &bull; ✉️ {{ recruiter.email }} &bull; Recruiter ID: #{{ recruiter.id }}
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="/create-job" class="btn btn-primary">+ Create Job & Intent Lock</a>
+        <a href="/applications" class="btn btn-outline">
+          📋 Review Applications
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric Counters -->
+  <div class="stats-grid" style="margin-bottom: 30px;">
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--accent);">{{ jobs|length }}</div>
+      <div class="stat-label">Jobs Posted</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--success);">
+        {{ jobs | selectattr("lock_status", "equalto", "ACTIVE") | list | length }}
+      </div>
+      <div class="stat-label">🟢 Active Intent Locks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--danger);">
+        {{ jobs | selectattr("lock_status", "equalto", "EXPIRED") | list | length }}
+      </div>
+      <div class="stat-label">🔴 Expired Postings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: #8b5cf6;">
+        {{ total_applications_count }}
+      </div>
+      <div class="stat-label">Applications Received</div>
+    </div>
+  </div>
+
+  <!-- Jobs Management Section -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">My Managed Job Postings</h2>
+        <p style="font-size: 0.9rem; margin-top: 4px;">Each active posting holds a tamper-evident SHA-256 cryptographic lock.</p>
+      </div>
+      <a href="/create-job" class="btn btn-primary btn-sm">+ New Posting</a>
+    </div>
+
+    {% if jobs %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Job ID & Title</th>
+              <th>Location & Comp</th>
+              <th>Vacancies</th>
+              <th>Intent Lock Status</th>
+              <th>Lock Expiration</th>
+              <th>Lock Hash Certificate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in jobs %}
+              <tr>
+                <td>
+                  <strong>#{{ job.id }} — {{ job.title }}</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                    Status: <span style="font-weight: 600;">{{ job.status }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div>📍 {{ job.location }}</div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">💰 {{ job.salary }}</div>
+                </td>
+                <td>
+                  <span class="badge badge-neutral">{{ job.vacancies }} open</span>
+                </td>
+                <td>
+                  {% if job.lock_status == 'ACTIVE' %}
+                    <span class="badge badge-active">🟢 ACTIVE LOCK</span>
+                  {% else %}
+                    <span class="badge badge-expired">🔴 EXPIRED LOCK</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div style="font-size: 0.85rem; font-weight: 500;">
+                    {{ job.expiry_at[:16].replace('T', ' ') if job.expiry_at else 'N/A' }}
+                  </div>
+                  {% if job.lock_status == 'ACTIVE' %}
+                    <div style="font-size: 0.75rem; color: var(--success-dark);">Actively accepting candidates</div>
+                  {% else %}
+                    <div style="font-size: 0.75rem; color: var(--danger);">Closed automatically</div>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="/lock/{{ job.id }}" class="btn btn-outline btn-sm">
+                    📜 View Lock Certificate
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 40px 20px;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">📭</div>
+        <h3>No Job Postings Yet</h3>
+        <p style="margin-bottom: 20px;">Create your first job posting to activate a tamper-evident Hiring Intent Lock.</p>
+        <a href="/create-job" class="btn btn-primary">+ Create Job & Activate Lock</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

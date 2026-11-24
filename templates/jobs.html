@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Verified Jobs — Ghost Job Verification System{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+  <div style="margin-bottom: 24px;">
+    <h1>💼 Verified Job Openings</h1>
+    <p>Every position here is cryptographically protected by a Hiring Intent Lock to protect you from ghost jobs.</p>
+  </div>
+
+  <!-- Search & Filter Form (Pure HTML, No JS) -->
+  <form action="/jobs" method="GET" class="search-bar-form">
+    <input 
+      type="text" 
+      name="q" 
+      class="form-control" 
+      placeholder="Search by job title, skill, or keyword..." 
+      value="{{ request.args.get('q', '') }}"
+    >
+    <input 
+      type="text" 
+      name="location" 
+      class="form-control" 
+      placeholder="Filter by location (e.g. Remote, NY)..." 
+      value="{{ request.args.get('location', '') }}"
+      style="max-width: 250px;"
+    >
+    <select name="status" class="form-control" style="max-width: 180px;">
+      <option value="ACTIVE" {% if request.args.get('status', 'ACTIVE') == 'ACTIVE' %}selected{% endif %}>Active Locks Only</option>
+      <option value="ALL" {% if request.args.get('status') == 'ALL' %}selected{% endif %}>All Listings (incl. Expired)</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter Jobs</button>
+    {% if request.args.get('q') or request.args.get('location') or request.args.get('status') %}
+      <a href="/jobs" class="btn btn-outline">Clear</a>
+    {% endif %}
+  </form>
+
+  <!-- Job Count Status -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <span style="font-size: 0.9rem; color: var(--text-muted);">
+      Showing <strong>{{ jobs|length }}</strong> verified job postings
+    </span>
+    <span class="badge badge-active">Anti-Ghost Protection Active</span>
+  </div>
+
+  <!-- Job Cards Grid -->
+  {% if jobs %}
+    <div class="job-grid">
+      {% for job in jobs %}
+        <div class="job-card {% if job.lock_status != 'ACTIVE' %}is-expired{% endif %}">
+          <div class="job-header">
+            <div>
+              <div class="job-company">
+                🏢 {{ job.company }}
+                <span class="badge badge-verified" style="font-size: 0.72rem; padding: 2px 8px;">
+                  ✓ Verified Recruiter
+                </span>
+              </div>
+              <h2 class="job-title">{{ job.title }}</h2>
+            </div>
+
+            <div>
+              {% if job.lock_status == 'ACTIVE' %}
+                <span class="badge badge-active">🟢 ACTIVE INTENT LOCK</span>
+              {% else %}
+                <span class="badge badge-expired">🔴 LOCK EXPIRED</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="job-meta-row">
+            <span class="job-meta-item">📍 {{ job.location }}</span>
+            <span class="job-meta-item">💰 {{ job.salary }}</span>
+            <span class="job-meta-item">👥 {{ job.vacancies }} Approved Vacancy</span>
+            <span class="job-meta-item">🆔 Job #{{ job.id }}</span>
+          </div>
+
+          <div class="job-desc">
+            {{ job.description }}
+          </div>
+
+          <div class="job-footer">
+            <div class="job-lock-info">
+              {% if job.lock_status == 'ACTIVE' %}
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--success-dark);">
+                  🔒 Verified Intent Lock Active
+                </div>
+                <div class="lock-time">
+                  Expires on: <strong>{{ job.expiry_at[:16].replace('T', ' ') if job.expiry_at else 'Active' }}</strong>
+                </div>
+              {% else %}
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--danger-dark);">
+                  🔴 Intent Lock Expired
+                </div>
+                <div class="lock-time">
+                  Closed on: {{ job.expiry_at[:16].replace('T', ' ') if job.expiry_at else 'Expired' }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <a href="/lock/{{ job.id }}" class="btn btn-outline btn-sm">
+                🔍 Verify Lock (#{{ job.id }})
+              </a>
+
+              {% if job.lock_status == 'ACTIVE' %}
+                <a href="/apply/{{ job.id }}" class="btn btn-primary">
+                  Apply Now &rarr;
+                </a>
+              {% else %}
+                <button class="btn btn-outline" disabled style="cursor: not-allowed; opacity: 0.6;">
+                  Applications Closed
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: 60px 20px;">
+      <div style="font-size: 3rem; margin-bottom: 12px;">🔍</div>
+      <h2>No Matching Jobs Found</h2>
+      <p style="margin-bottom: 20px;">Try adjusting your search criteria or clearing filters.</p>
+      <a href="/jobs" class="btn btn-primary">View All Available Jobs</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

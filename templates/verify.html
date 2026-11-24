@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Job & Hiring Intent Lock — Cryptographic Verification Engine{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+  <div style="max-width: 800px; margin: 0 auto;">
+
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div
+        style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: var(--accent-soft); border-radius: 50%; font-size: 1.8rem; margin-bottom: 12px; color: var(--accent);">
+        🔍
+      </div>
+      <h1>Hiring Intent Lock Verification Engine</h1>
+      <p style="max-width: 620px; margin: 8px auto 0 auto;">
+        Inspect any job listing to verify recruiter legitimacy, audit cryptographic integrity via SHA-256, and confirm
+        the hiring window has not expired.
+      </p>
+    </div>
+
+    <!-- Verification Lookup Form -->
+    <div class="card" style="box-shadow: var(--shadow-md); margin-bottom: 30px;">
+      <form action="/verify" method="GET">
+        <label class="form-label" style="font-size: 1rem;">
+          Enter Job ID or SHA-256 Lock Hash to Verify:
+        </label>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <input type="text" name="query" class="form-control" placeholder="e.g. 1 or paste 64-char SHA-256 hash..."
+            value="{{ query or '' }}" required style="flex: 1; min-width: 250px;">
+          <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">
+            Verify Intent
+          </button>
+        </div>
+        <div class="form-hint" style="margin-top: 8px;">
+          You can test with any Job ID from the <a href="/jobs">job board</a> or copy a lock hash from a certificate.
+        </div>
+      </form>
+    </div>
+
+    <!-- Verification Results Section -->
+    {% if result %}
+    {% if result.found %}
+    <div class="certificate-card" style="margin-top: 0;">
+      <div class="cert-header">
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-light); text-transform: uppercase;">
+            Verification Audit Result
+          </div>
+          <h2 style="font-size: 1.6rem; color: var(--primary); margin-top: 4px;">
+            {{ result.job.title }}
+          </h2>
+          <p style="font-size: 0.9rem;">
+            Company: <strong>{{ result.job.company }}</strong> &bull; Job ID: <strong>#{{ result.job.id }}</strong>
+          </p>
+        </div>
+
+        <div>
+          {% if result.is_active and result.hash_valid %}
+          <span class="badge badge-active" style="font-size: 0.95rem; padding: 8px 16px;">
+            🟢 ACTIVE & GENUINE
+          </span>
+          {% elif not result.is_active and result.hash_valid %}
+          <span class="badge badge-expired" style="font-size: 0.95rem; padding: 8px 16px;">
+            🔴 EXPIRED (GHOST PREVENTED)
+          </span>
+          {% else %}
+          <span class="badge badge-expired" style="font-size: 0.95rem; padding: 8px 16px;">
+            ⚠️ HASH MISMATCH / TAMPERED
+          </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Integrity Checks Matrix -->
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div
+          style="background: var(--surface-alt); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">1. RECRUITER IDENTITY</div>
+          <div style="font-weight: 700; color: var(--success-dark); margin-top: 4px;">
+            ✓ Verified Corporate Identity
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Recruiter ID #{{ result.job.recruiter_id }}</div>
+        </div>
+
+        <div
+          style="background: var(--surface-alt); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">2. SHA-256 INTEGRITY</div>
+          <div
+            style="font-weight: 700; color: {% if result.hash_valid %}var(--success-dark){% else %}var(--danger){% endif %}; margin-top: 4px;">
+            {% if result.hash_valid %}✓ Cryptographic Match{% else %}✗ Hash Integrity Failed{% endif %}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Deterministic computation verified</div>
+        </div>
+
+        <div
+          style="background: var(--surface-alt); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">3. HIRING TIMEFRAME</div>
+          <div
+            style="font-weight: 700; color: {% if result.is_active %}var(--success-dark){% else %}var(--danger){% endif %}; margin-top: 4px;">
+            {% if result.is_active %}✓ Within Active Window{% else %}✗ Expiration Reached{% endif %}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Deadline: {{ result.job.expiry_at[:10] }}</div>
+        </div>
+      </div>
+
+      <!-- Cryptographic Hash Audit -->
+      <div style="margin-bottom: 20px;">
+        <span class="cert-detail-label">Audited SHA-256 Lock Hash:</span>
+        <div class="hash-box">
+          {{ result.job.hash }}
+        </div>
+      </div>
+
+      <div
+        style="background: var(--surface); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.82rem; margin-bottom: 24px;">
+        <strong>Verification Formula:</strong> <code
+          style="color: var(--accent-text);">SHA256({{ result.job.recruiter_id }}|{{ result.job.id }}|{{ result.job.created_at }}|{{ result.job.expiry_at }})</code>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <a href="/lock/{{ result.job.id }}" class="btn btn-outline">
+          📜 View Full Certificate
+        </a>
+
+        {% if result.is_active %}
+        <a href="/apply/{{ result.job.id }}" class="btn btn-primary">
+          Proceed to Job Application &rarr;
+        </a>
+        {% else %}
+        <span class="badge badge-expired" style="padding: 10px 16px;">
+          Cannot Apply: Intent Lock Expired
+        </span>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="card"
+      style="text-align: center; padding: 40px; border-color: var(--danger-border); background: var(--danger-bg);">
+      <div style="font-size: 2.5rem; margin-bottom: 12px;">⚠️</div>
+      <h3 style="color: #9f1239;">Verification Failed — No Valid Lock Found</h3>
+      <p style="color: #b91c1c; max-width: 500px; margin: 8px auto 20px auto;">
+        We could not find an authentic Hiring Intent Lock matching query <code>"{{ query }}"</code>.
+        This listing may be unverified, forged, or deleted.
+      </p>
+      <a href="/verify" class="btn btn-outline">Try Another Search</a>
+    </div>
+    {% endif %}
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

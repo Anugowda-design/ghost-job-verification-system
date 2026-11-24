@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for {{ job.title }} — Ghost Job Verification System{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+  <div class="form-card" style="max-width: 640px;">
+    <div class="form-header">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">💼</div>
+      <h2>Submit Your Application</h2>
+      <p>Applying for <strong>{{ job.title }}</strong> at <strong>{{ job.company }}</strong></p>
+    </div>
+
+    <!-- Active Intent Lock Banner -->
+    <div style="background: var(--success-bg); border: 1px solid var(--success-border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--success-dark);">
+          🟢 VERIFIED HIRING INTENT LOCK ACTIVE
+        </div>
+        <div style="font-size: 0.78rem; color: #166534; margin-top: 2px;">
+          Job ID: #{{ job.id }} &bull; Lock expires: {{ job.expiry_at[:10] }}
+        </div>
+      </div>
+      <a href="/lock/{{ job.id }}" class="btn btn-outline btn-sm">View Lock</a>
+    </div>
+
+    <form method="POST" action="/apply/{{ job.id }}">
+      <div class="form-group">
+        <label class="form-label" for="name">Your Full Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          class="form-control" 
+          placeholder="Enter your full name" 
+          required 
+          autocomplete="name"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="form-control" 
+          placeholder="Enter your email address" 
+          required 
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone Number</label>
+        <input 
+          type="tel" 
+          id="phone" 
+          name="phone" 
+          class="form-control" 
+          placeholder="Enter your contact phone number" 
+          required 
+          autocomplete="tel"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="resume">Resume / Portfolio Link (or summary)</label>
+        <input 
+          type="text" 
+          id="resume" 
+          name="resume" 
+          class="form-control" 
+          placeholder="https://linkedin.com/in/... or drive link / resume file name" 
+          required
+        >
+        <div class="form-hint">Provide your online resume link, portfolio, or profile URL.</div>
+      </div>
+
+      <div style="margin-top: 28px;">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Submit Application
+        </button>
+      </div>
+
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="/jobs" style="font-size: 0.9rem; color: var(--text-muted);">&larr; Back to Job Listings</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

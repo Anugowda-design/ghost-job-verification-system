@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Ghost Job & Fake Recruiter Verification System{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-text">
+          HiringIntent Lock
+          <span>Anti-Ghost Verification</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item {% if active_page == 'home' %}active{% endif %}">
+            <a href="/">🏠 Home</a>
+          </li>
+          <li class="nav-item {% if active_page == 'jobs' %}active{% endif %}">
+            <a href="/jobs">💼 Explore Jobs</a>
+          </li>
+          <li class="nav-item {% if active_page == 'verify' %}active{% endif %}">
+            <a href="/verify">🔍 Verify Job Lock</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        {% if session.get('recruiter_id') %}
+        <a href="/dashboard" class="btn btn-outline btn-sm">📊 Dashboard</a>
+        <a href="/create-job" class="btn btn-primary btn-sm">+ Post Job</a>
+        <a href="/logout" class="btn btn-outline btn-sm">🚪 Logout</a>
+        {% else %}
+        <a href="/login" class="btn btn-outline btn-sm">Recruiter Login</a>
+        <a href="/register" class="btn btn-primary btn-sm">Register as Recruiter</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Message Container -->
+  <div class="container alert-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+      <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content Body -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/jobs">Browse Verified Jobs</a></li>
+            <li><a href="/verify">Verify Intent Lock</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>For Employers</h4>
+          <ul>
+            <li><a href="/register">Recruiter Registration</a></li>
+            <li><a href="/login">Recruiter Portal</a></li>
+            <li><a href="/create-job">Create Timed Lock</a></li>
+            <li><a href="/applications">Track Applications</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Ghost Job Verification System • Built with Python Flask, SQLite, and Pure HTML/CSS</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>

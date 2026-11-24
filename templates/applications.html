@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Received Candidate Applications — Ghost Job Verification System{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <div>
+      <h1>📋 Received Candidate Applications</h1>
+      <p>Applications submitted directly by job seekers for your verified postings.</p>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+      <a href="/dashboard" class="btn btn-outline">&larr; Recruiter Dashboard</a>
+      <a href="/create-job" class="btn btn-primary">+ Post New Job</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Total Applications ({{ applications|length }})</h2>
+      <span class="badge badge-verified">Direct Verified Candidate Stream</span>
+    </div>
+
+    {% if applications %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Applicant Name</th>
+              <th>Target Job Position</th>
+              <th>Contact Info</th>
+              <th>Resume / Profile</th>
+              <th>Applied Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+              <tr>
+                <td>
+                  <strong>{{ app.applicant_name }}</strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">Application ID #{{ app.id }}</div>
+                </td>
+                <td>
+                  <strong>{{ app.title }}</strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">Job ID #{{ app.job_id }}</div>
+                </td>
+                <td>
+                  <div>✉️ <a href="mailto:{{ app.applicant_email }}">{{ app.applicant_email }}</a></div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">📞 {{ app.phone }}</div>
+                </td>
+                <td>
+                  <span class="badge badge-neutral" style="font-family: var(--font-mono); font-size: 0.78rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">
+                    {{ app.resume }}
+                  </span>
+                </td>
+                <td>
+                  <div style="font-size: 0.85rem;">
+                    {{ app.applied_at[:16].replace('T', ' ') if app.applied_at else 'Recent' }}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 40px 20px;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">📂</div>
+        <h3>No Applications Received Yet</h3>
+        <p style="margin-bottom: 20px;">Once candidates apply to your active job listings, their details will appear here.</p>
+        <a href="/dashboard" class="btn btn-primary">Return to Dashboard</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

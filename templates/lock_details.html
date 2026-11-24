@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Hiring Intent Lock Certificate #{{ lock.job_id }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 30px 20px;">
+  <div class="certificate-card">
+    <div class="cert-header">
+      <div class="cert-title">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.5rem;">📜</span>
+          <h1>Cryptographic Hiring Intent Lock Certificate</h1>
+        </div>
+        <p style="color: var(--text-muted); margin-top: 4px;">
+          Proof of Active Hiring Intent • Nonce-Free Deterministic Verification
+        </p>
+      </div>
+
+      <div>
+        {% if lock.status == 'ACTIVE' %}
+          <span class="badge badge-active" style="font-size: 0.95rem; padding: 8px 16px;">
+            🟢 LOCK ACTIVE
+          </span>
+        {% else %}
+          <span class="badge badge-expired" style="font-size: 0.95rem; padding: 8px 16px;">
+            🔴 LOCK EXPIRED
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Job Title & Recruiter -->
+    <div style="margin-bottom: 20px;">
+      <h2 style="font-size: 1.4rem; color: var(--text-main); margin-bottom: 4px;">
+        {{ lock.title }}
+      </h2>
+      <p style="font-size: 0.95rem;">
+        Organization: <strong>{{ lock.company }}</strong> &bull; 
+        Recruiter: <strong>{{ lock.recruiter_name }}</strong> (ID: #{{ lock.recruiter_id }})
+      </p>
+    </div>
+
+    <!-- SHA-256 Cryptographic Hash Box -->
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="cert-detail-label">🔐 SHA-256 Tamper-Evident Intent Hash</span>
+        <span class="badge badge-verified" style="font-size: 0.75rem;">Verified Integrity</span>
+      </div>
+
+      <div class="hash-box">
+        {{ lock.hash }}
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-light); margin-top: -8px; margin-bottom: 16px;">
+        Generated using standard SHA-256 algorithm. Immutable verification without blockchain latency or gas fees.
+      </div>
+    </div>
+
+    <!-- Mathematical Payload Breakdown -->
+    <div style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px dashed var(--border); margin-bottom: 20px;">
+      <div class="cert-detail-label" style="color: var(--text-dim);">Deterministic Hash Input Payload:</div>
+      <code style="display: block; font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-text); margin-top: 4px; word-break: break-all;">
+        {{ lock.recruiter_id }}|{{ lock.job_id }}|{{ lock.created_at }}|{{ lock.expiry_at }}
+      </code>
+    </div>
+
+    <!-- Certificate Details Grid -->
+    <div class="cert-details-grid">
+      <div class="cert-detail-item">
+        <span class="cert-detail-label">Associated Job ID</span>
+        <span class="cert-detail-value">#{{ lock.job_id }}</span>
+      </div>
+
+      <div class="cert-detail-item">
+        <span class="cert-detail-label">Recruiter Identity ID</span>
+        <span class="cert-detail-value">#{{ lock.recruiter_id }} (Verified)</span>
+      </div>
+
+      <div class="cert-detail-item">
+        <span class="cert-detail-label">Lock Creation Timestamp</span>
+        <span class="cert-detail-value">{{ lock.created_at[:19].replace('T', ' ') }}</span>
+      </div>
+
+      <div class="cert-detail-item">
+        <span class="cert-detail-label">Automatic Expiration Deadline</span>
+        <span class="cert-detail-value">{{ lock.expiry_at[:19].replace('T', ' ') }}</span>
+      </div>
+    </div>
+
+    <!-- Verification Explanation -->
+    <div style="background: var(--success-bg); border: 1px solid var(--success-border); border-radius: var(--radius-md); padding: 18px; margin: 24px 0;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <span style="font-size: 1.3rem;">🛡️</span>
+        <div>
+          <h4 style="color: var(--success-dark); font-size: 0.95rem; margin-bottom: 4px;">
+            Ghost Job Protection Guarantee
+          </h4>
+          <p style="font-size: 0.85rem; color: #166534; margin: 0;">
+            {% if lock.status == 'ACTIVE' %}
+              This position is legally anchored to an active hiring intent window. It is guaranteed not to be a stale archive, data collector, or ghost posting. Once the expiration time is reached, application intake will automatically cease.
+            {% else %}
+              This intent lock has reached its designated expiration deadline. In accordance with system anti-ghost rules, applications are disabled.
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <a href="/verify?query={{ lock.hash }}" class="btn btn-outline">
+        🔍 Test Hash in Verification Engine
+      </a>
+
+      <div style="display: flex; gap: 10px;">
+        <a href="/jobs" class="btn btn-outline">Browse Jobs</a>
+        {% if session.get('recruiter_id') %}
+          <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+        {% else %}
+          <a href="/apply/{{ lock.job_id }}" class="btn btn-primary">Apply for Job</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

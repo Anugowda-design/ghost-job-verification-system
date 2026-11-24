@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Recruiter Login — Ghost Job Verification System{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="form-card" style="max-width: 480px;">
+    <div class="form-header">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">🔐</div>
+      <h2>Recruiter Login</h2>
+      <p>Access your dashboard to manage verified postings and review applications.</p>
+    </div>
+
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label class="form-label" for="email">Work Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="form-control" 
+          placeholder="your.email@company.com" 
+          required 
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-control" 
+          placeholder="Enter your password" 
+          required 
+          autocomplete="current-password"
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+        Sign In to Recruiter Portal
+      </button>
+
+      <div style="text-align: center; margin-top: 24px; font-size: 0.9rem;">
+        Need to post a job? <a href="/register">Create a verified recruiter account</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Hiring Intent Lock — Ghost Job & Fake Recruiter Verification Network{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-pill">
+      🛡️ Innovation: Deterministic Hiring Intent Lock
+    </div>
+
+    <h1 class="hero-title">
+      Put an End to <span class="gradient-text">Ghost Jobs & Fake Postings</span>
+    </h1>
+
+    <p class="hero-desc">
+      Every legitimate job deserves a verifiable commitment. Our platform binds job postings to a tamper-evident 
+      <strong>SHA-256 cryptographic lock</strong> with guaranteed auto-expiration, ensuring job seekers only apply to actively funded, real openings.
+    </p>
+
+    <div class="hero-actions">
+      <a href="/jobs" class="btn btn-primary btn-lg">💼 Browse Verified Jobs</a>
+      <a href="/verify" class="btn btn-outline btn-lg">🔍 Verify Job Lock</a>
+      {% if not session.get('recruiter_id') %}
+        <a href="/register" class="btn btn-success btn-lg">📝 Post as Recruiter</a>
+      {% endif %}
+    </div>
+
+    <!-- Quick Search / Verify Form -->
+    <div style="max-width: 680px; margin: 0 auto;">
+      <form action="/verify" method="GET" class="search-bar-form">
+        <input 
+          type="text" 
+          name="query" 
+          class="form-control" 
+          placeholder="Enter Job ID (e.g. 1) or 64-character SHA-256 Lock Hash to verify..." 
+          required
+        >
+        <button type="submit" class="btn btn-primary">Verify Lock</button>
+      </form>
+    </div>
+
+    <!-- Live Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--accent);">{{ stats.total_jobs }}</div>
+        <div class="stat-label">Total Listings Registered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--success);">{{ stats.active_locks }}</div>
+        <div class="stat-label">🟢 Active Intent Locks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--danger);">{{ stats.expired_locks }}</div>
+        <div class="stat-label">🔴 Expired / Deactivated</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--cyan);">{{ stats.total_recruiters }}</div>
+        <div class="stat-label">Verified Employers</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section style="padding: 60px 0;">
+  <div class="container">
+    <div class="section-title">
+      <h2>How the Hiring Intent Lock Works</h2>
+      <p>A transparent, deterministic verification architecture that eliminates phantom openings.</p>
+    </div>
+
+    <div class="workflow-steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Recruiter Vetting</h3>
+        <p>Recruiters register with verified corporate domain credentials, establishing legal business identity.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Post & Intent Lock</h3>
+        <p>Recruiter publishes job with clear headcount budget and commits to a strict active hiring window (e.g. 30 days).</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Cryptographic Proof</h3>
+        <p>A deterministic SHA-256 hash seals the recruiter ID, job ID, and expiration date into an audit-ready lock.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h3>Automatic Expiry</h3>
+        <p>When the hiring window ends, the system automatically deactivates the listing and closes applications.</p>
+      </div>
+    </div>
+
+    <!-- Platform Guarantees -->
+    <div class="card" style="margin-top: 40px;">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">Platform Guarantees</h3>
+          <p style="font-size: 0.9rem; margin-top: 4px;">Built to restore integrity and trust between employers and candidates.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+        <div style="background: var(--surface-alt); padding: 22px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">🛡️</div>
+          <h4>Zero Ghost Postings</h4>
+          <p style="font-size: 0.9rem; margin-top: 6px;">
+            Every job posting is tied to an active hiring window. When the deadline passes, applications automatically lock, eliminating stale resume-harvesting posts.
+          </p>
+          <div style="margin-top: 14px;">
+            <a href="/jobs" class="btn btn-sm btn-outline">Browse Real Openings</a>
+          </div>
+        </div>
+
+        <div style="background: var(--surface-alt); padding: 22px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">🏢</div>
+          <h4>Verified Employers Only</h4>
+          <p style="font-size: 0.9rem; margin-top: 6px;">
+            Recruiters must register with legitimate company credentials. Unverified recruiters cannot publish openings, protecting candidates from phishing and identity fraud.
+          </p>
+          <div style="margin-top: 14px;">
+            <a href="/register" class="btn btn-sm btn-outline">Recruiter Portal</a>
+          </div>
+        </div>
+
+        <div style="background: var(--surface-alt); padding: 22px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">🔐</div>
+          <h4>Instant Cryptographic Audit</h4>
+          <p style="font-size: 0.9rem; margin-top: 6px;">
+            Anyone can verify job authenticity using our deterministic SHA-256 validation engine. No opaque algorithms—pure mathematical verification.
+          </p>
+          <div style="margin-top: 14px;">
+            <a href="/verify" class="btn btn-sm btn-outline">Verify Any Job</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
